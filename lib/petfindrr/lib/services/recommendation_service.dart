@@ -8,7 +8,6 @@ class RecommendationService {
   PreferenceVector _preferenceVector;
   final List<Swipe> _swipeHistory = [];
   
-  // Hyperparameters
   static const int _maxSwipeHistory = 25;
   static const int _retrainInterval = 5;
   static const double _learningRate = 0.15;
@@ -20,41 +19,34 @@ class RecommendationService {
           userProfile.initialPreferenceVector,
         );
 
-  // Record a swipe and trigger retraining if needed
   void recordSwipe(Pet pet, bool liked) {
     final swipe = Swipe.fromPet(pet.id, pet.featureVector, liked);
     
     _swipeHistory.add(swipe);
     
-    // Keep history window small
     if (_swipeHistory.length > _maxSwipeHistory) {
       _swipeHistory.removeAt(0);
     }
 
-    // Retrain every N swipes
     if (_swipeHistory.length % _retrainInterval == 0) {
       _retrain();
     }
   }
 
-  // Online learning: shift preference center toward liked pets
   void _retrain() {
     final likedSwipes = _swipeHistory.where((s) => s.liked).toList();
     
     if (likedSwipes.isEmpty) return;
 
-    // Update preference vector for each liked pet
     for (final swipe in likedSwipes) {
       _preferenceVector.update(swipe.petFeatures, _learningRate);
     }
   }
 
-  // Calculate base compatibility (profile-based)
   double _calculateBaseScore(Pet pet, UserProfile userProfile) {
     int score = 0;
     int factors = 0;
 
-    // Budget match (30 points)
     if (userProfile.budget != null) {
       factors++;
       final budgetDiff = (userProfile.budget! - pet.price).abs();
@@ -67,14 +59,12 @@ class RecommendationService {
       }
     }
 
-    // Size preference (25 points)
     if (userProfile.preferredSizes != null && 
         userProfile.preferredSizes!.contains(pet.size)) {
       score += 25;
       factors++;
     }
 
-    // Home size match (20 points)
     if (userProfile.homeSize != null) {
       factors++;
       final Map<String, List<String>> compatibleSizes = {
@@ -87,7 +77,6 @@ class RecommendationService {
       }
     }
 
-    // Energy level match (25 points)
     if (userProfile.activityLevel != null) {
       factors++;
       if (userProfile.activityLevel == pet.energyLevel) {
@@ -101,13 +90,11 @@ class RecommendationService {
     return factors > 0 ? score / 100.0 : 0.75;
   }
 
-  // Calculate adaptive score (learned behavior)
   double _calculateAdaptiveScore(Pet pet) {
     if (_preferenceVector.updateCount == 0) {
-      return 0.5; // Neutral until we learn
+      return 0.5; 
     }
 
-    // Euclidean distance in feature space
     final petVector = pet.featureVector;
     double distance = 0.0;
     
@@ -117,13 +104,10 @@ class RecommendationService {
     }
     distance = sqrt(distance);
 
-    // Normalize to 0-1 (smaller distance = higher score)
-    // Max possible distance in 4D space with values [0-3] is ~6
     final normalizedDistance = (distance / 6.0).clamp(0.0, 1.0);
     return 1.0 - normalizedDistance;
   }
 
-  // Final combined score
   double scoreFor(Pet pet, UserProfile userProfile) {
     final baseScore = _calculateBaseScore(pet, userProfile);
     final adaptiveScore = _calculateAdaptiveScore(pet);
@@ -131,7 +115,6 @@ class RecommendationService {
     return (_baseWeight * baseScore) + (_adaptiveWeight * adaptiveScore);
   }
 
-  // Rank a list of pets by score
   List<Pet> rankPets(List<Pet> pets, UserProfile userProfile) {
     final scored = pets.map((pet) {
       return {
@@ -145,7 +128,6 @@ class RecommendationService {
     return scored.map((item) => item['pet'] as Pet).toList();
   }
 
-  // Get current preference state (for debugging)
   Map<String, dynamic> getPreferenceState() {
     return {
       'vector': _preferenceVector.vector,
@@ -155,7 +137,6 @@ class RecommendationService {
     };
   }
 
-  // Persistence
   Map<String, dynamic> toJson() {
     return {
       'preferenceVector': _preferenceVector.toJson(),

@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 
-// Comment out Firebase for now
-// import 'package:firebase_core/firebase_core.dart';
 import 'screens/role_selection_screen.dart';
 
+//wait for firebase init to run code or it will explode
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Comment out Firebase initialization
-  // await Firebase.initializeApp();
   
   runApp(const PetMatchApp());
 }
@@ -19,7 +15,7 @@ class PetMatchApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'PetMatch',
+      title: 'PETFINDRRRR',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -27,7 +23,7 @@ class PetMatchApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const RoleSelectionScreen(), // Start here instead of SplashScreen
+      home: const RoleSelectionScreen(), 
     );
   }
 }

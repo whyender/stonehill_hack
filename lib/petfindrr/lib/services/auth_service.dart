@@ -47,13 +47,11 @@ class AuthService {
     return null;
   }
 
-  // update a user profile
   Future<void> updateProfile(String uid, Map<String, dynamic> data) async {
     data['updatedAt'] = Timestamp.fromDate(DateTime.now());
     await _firestore.collection('users').doc(uid).update(data);
   }
 
-  // sign out
   Future<void> signOut() async {
     await _auth.signOut();
   }

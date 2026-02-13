@@ -53,7 +53,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    '💬',
+                    'TALKKKKKK',
                     style: TextStyle(fontSize: 80),
                   ),
                   const SizedBox(height: 16),
@@ -66,7 +66,7 @@ class _MatchesScreenState extends State<MatchesScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Start swiping to find your perfect pet!',
+                    'Start swiping to find your PLEACEHODLER. TEXTTT!',
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.grey[600],

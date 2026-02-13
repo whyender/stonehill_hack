@@ -101,7 +101,7 @@ class _ProfileBuilderScreenState extends State<ProfileBuilderScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'This helps us find the perfect pet for your home',
+                  'This helps us find placeHOLDERe',
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
                 const SizedBox(height: 32),
@@ -116,34 +116,34 @@ class _ProfileBuilderScreenState extends State<ProfileBuilderScreen> {
                   controller: _budgetController,
                   keyboardType: TextInputType.number,
                   validator: (v) {
-                    if (v!.isEmpty) return 'Enter your budget';
+                    if (v!.isEmpty) return 'BUDGETTt';
                     if (double.tryParse(v) == null) return 'Enter a valid number';
                     return null;
                   },
                 ),
                 const SizedBox(height: 16),
                 CustomTextField(
-                  label: 'Location ([city and statee]',
+                  label: 'Location ([citYy and statee]',
                   controller: _locationController,
                   validator: (v) => v!.isEmpty ? 'Please enter location' : null,
                 ),
                 const SizedBox(height: 24),
                 _buildSection(
-                  'Home Size',
+                  'HSIZE OF YOUR HOUSEE',
                   ['Small', 'Medium', 'Large'],
                   _homeSize,
                   (value) => setState(() => _homeSize = value.toLowerCase()),
                 ),
                 const SizedBox(height: 24),
                 _buildSection(
-                  'Activity Level',
+                  'ACTIIVTYYY',
                   ['Low', 'Medium', 'High'],
                   _activityLevel,
                   (value) => setState(() => _activityLevel = value.toLowerCase()),
                 ),
                 const SizedBox(height: 24),
                 const Text(
-                  'Preferred Pet Size',
+                  'SIZEEE',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
@@ -173,7 +173,7 @@ class _ProfileBuilderScreenState extends State<ProfileBuilderScreen> {
                 ),
                 const SizedBox(height: 40),
                 CustomButton(
-                  text: 'Start Swiping',
+                  text: 'swipe',
                   onPressed: _submit,
                   isLoading: _isLoading,
                 ),

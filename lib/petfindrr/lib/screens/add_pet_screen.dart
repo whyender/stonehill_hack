@@ -72,13 +72,12 @@ class _AddPetScreenState extends State<AddPetScreen> {
     try {
       final sellerId = _authService.currentUser!.uid;
       
-      // Upload images
       final imageUrls = await _storageService.uploadMultiplePetImages(
         _images,
         sellerId,
       );
 
-      // Create pet
+
       final pet = Pet(
         id: '',
         sellerId: sellerId,
@@ -105,7 +104,6 @@ class _AddPetScreenState extends State<AddPetScreen> {
         ),
       );
 
-      // Clear form
       _formKey.currentState!.reset();
       setState(() {
         _images = [];

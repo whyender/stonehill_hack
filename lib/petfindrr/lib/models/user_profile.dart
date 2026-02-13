@@ -3,14 +3,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserProfile {
   final String uid;
   final String email;
-  final String role; // 'adopter' or 'seller'
+  final String role; 
   final String? name;
   
   
   final double? budget;
-  final String? homeSize; // small, medium, large
-  final String? activityLevel; // low, medium, high
-  final List<String>? preferredSizes; // small, medium, large
+  final String? homeSize;
+  final String? activityLevel; 
+  final List<String>? preferredSizes;
   final List<String>? location;
   
   final DateTime createdAt;
@@ -74,7 +74,7 @@ class UserProfile {
         homeSizeScore.toDouble(),
         activityScore.toDouble(),
         budgetScore,
-        2.0, // Neutral age preference (adult dogs)
+        2.0, 
       ];
 
   

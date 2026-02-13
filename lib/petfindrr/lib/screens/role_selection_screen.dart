@@ -29,7 +29,7 @@ class RoleSelectionScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                'Choose how you\'d like to get started',
+                'Choose how you\'dpleaceholder',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],

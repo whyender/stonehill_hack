@@ -11,7 +11,6 @@ class Swipe {
     required this.timestamp,
   });
 
-  // Factory from Pet object
   factory Swipe.fromPet(String petId, List<double> features, bool liked) {
     return Swipe(
       petId: petId,
@@ -21,7 +20,6 @@ class Swipe {
     );
   }
 
-  // Serialization for persistence
   Map<String, dynamic> toJson() {
     return {
       'petId': petId,

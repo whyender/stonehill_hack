@@ -7,7 +7,6 @@ class PreferenceVector {
     this.updateCount = 0,
   });
 
-  // Initialize from user profile (cold start solution)
   factory PreferenceVector.fromUserProfile(List<double> profileVector) {
     return PreferenceVector(
       vector: List.from(profileVector),
@@ -15,7 +14,6 @@ class PreferenceVector {
     );
   }
 
-  // Update based on liked pet features
   void update(List<double> likedFeatures, double learningRate) {
     for (int i = 0; i < vector.length; i++) {
       // Move preference center toward liked pet
@@ -24,7 +22,6 @@ class PreferenceVector {
     updateCount++;
   }
 
-  // Serialization for persistence
   Map<String, dynamic> toJson() {
     return {
       'vector': vector,

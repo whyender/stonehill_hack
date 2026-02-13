@@ -47,7 +47,6 @@ class PetCard extends StatelessWidget {
               ),
             ),
             
-            // Compatibility Badge (Top Right)
             if (compatibilityScore != null)
               Positioned(
                 top: 20,
@@ -82,7 +81,6 @@ class PetCard extends StatelessWidget {
                 ),
               ),
             
-            // Pet Info (Bottom)
             Positioned(
               bottom: 0,
               left: 0,
@@ -155,7 +153,6 @@ class PetCard extends StatelessWidget {
   }
 
   Widget _buildImage() {
-    // Check if pet has images
     if (pet.imageUrls.isEmpty) {
       return Container(
         color: Colors.grey[300],
@@ -169,7 +166,7 @@ class PetCard extends StatelessWidget {
       );
     }
 
-    // Load first image
+    
     return Image.network(
       pet.imageUrls.first,
       fit: BoxFit.cover,
@@ -197,7 +194,7 @@ class PetCard extends StatelessWidget {
                 Icon(Icons.pets, size: 100, color: Colors.grey),
                 SizedBox(height: 8),
                 Text(
-                  'Image not available',
+                  'Image not there',
                   style: TextStyle(color: Colors.grey),
                 ),
               ],
