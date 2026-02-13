@@ -3,14 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserProfile {
   final String uid;
   final String email;
-  final String role; //role them as either an adopter or a seller/adoptoion center
+  final String role; // 'adopter' or 'seller'
   final String? name;
   
+  
   final double? budget;
-  final String? homeSize; // small, medium, large to see if enoguh space
-  final String? activityLevel; // low, medium, high for walking
-  final List<String>? preferredSizes; // small, medium, large algon wiht general consensuses for size
-  final List<String>? location; //in km for righ tnow but can be more specific later on with city or state
+  final String? homeSize; // small, medium, large
+  final String? activityLevel; // low, medium, high
+  final List<String>? preferredSizes; // small, medium, large
+  final List<String>? location;
   
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -28,6 +29,55 @@ class UserProfile {
     required this.createdAt,
     required this.updatedAt,
   });
+
+  
+  
+  int get homeSizeScore {
+    if (homeSize == null) return 2;
+    switch (homeSize!.toLowerCase()) {
+      case 'small': return 1;
+      case 'medium': return 2;
+      case 'large': return 3;
+      default: return 2;
+    }
+  }
+
+  int get activityScore {
+    if (activityLevel == null) return 2;
+    switch (activityLevel!.toLowerCase()) {
+      case 'low': return 1;
+      case 'medium': return 2;
+      case 'high': return 3;
+      default: return 2;
+    }
+  }
+
+  double get budgetScore {
+    if (budget == null) return 0.5;
+    return (budget! / 2000.0).clamp(0.0, 1.0);
+  }
+
+  List<int> get preferredSizeScores {
+    if (preferredSizes == null || preferredSizes!.isEmpty) return [1, 2, 3];
+    return preferredSizes!.map((size) {
+      switch (size.toLowerCase()) {
+        case 'small': return 1;
+        case 'medium': return 2;
+        case 'large': return 3;
+        default: return 2;
+      }
+    }).toList();
+  }
+
+  
+  List<double> get initialPreferenceVector => [
+        homeSizeScore.toDouble(),
+        activityScore.toDouble(),
+        budgetScore,
+        2.0, // Neutral age preference (adult dogs)
+      ];
+
+  
 
   factory UserProfile.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;

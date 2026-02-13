@@ -3,6 +3,7 @@ import '../models/pet.dart';
 import '../models/user_profile.dart';
 import '../services/auth_service.dart';
 import '../services/firestore_service.dart';
+import '../services/recommendation_service.dart';
 import '../widgets/pet_card.dart';
 import 'matches_screen.dart';
 
@@ -17,6 +18,7 @@ class _SwipeScreenState extends State<SwipeScreen> {
   final _authService = AuthService();
   final _firestoreService = FirestoreService();
   
+  RecommendationService? _recommendationService;
   UserProfile? _userProfile;
   List<Pet> _pets = [];
   int _currentIndex = 0;
@@ -27,55 +29,206 @@ class _SwipeScreenState extends State<SwipeScreen> {
   @override
   void initState() {
     super.initState();
-    _loadUserAndPets();
+    _loadMockData();
   }
 
-  Future<void> _loadUserAndPets() async {
+  void _loadMockData() {
+    setState(() {
+      _pets = [
+        Pet(
+          id: '1',
+          sellerId: 'mock_seller_1',
+          name: 'Luna',
+          breed: 'Golden Retriever',
+          age: 2,
+          size: 'large',
+          energyLevel: 'high',
+          price: 500,
+          imageUrls: ['https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=800'],
+          description: 'Friendly and energetic dog looking for an active family!',
+          location: 'San Francisco, CA',
+          createdAt: DateTime.now(),
+          likedBy: [],
+          passedBy: [],
+        ),
+        Pet(
+          id: '2',
+          sellerId: 'mock_seller_2',
+          name: 'Max',
+          breed: 'French Bulldog',
+          age: 3,
+          size: 'small',
+          energyLevel: 'low',
+          price: 800,
+          imageUrls: ['https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=800'],
+          description: 'Calm and cuddly companion perfect for apartment living.',
+          location: 'Los Angeles, CA',
+          createdAt: DateTime.now(),
+          likedBy: [],
+          passedBy: [],
+        ),
+        Pet(
+          id: '3',
+          sellerId: 'mock_seller_3',
+          name: 'Bella',
+          breed: 'Labrador Retriever',
+          age: 1,
+          size: 'large',
+          energyLevel: 'high',
+          price: 450,
+          imageUrls: ['https://images.unsplash.com/photo-1552053831-71594a27632d?w=800'],
+          description: 'Playful puppy ready to bring joy to your home!',
+          location: 'Austin, TX',
+          createdAt: DateTime.now(),
+          likedBy: [],
+          passedBy: [],
+        ),
+        Pet(
+          id: '4',
+          sellerId: 'mock_seller_4',
+          name: 'Charlie',
+          breed: 'Beagle',
+          age: 4,
+          size: 'medium',
+          energyLevel: 'medium',
+          price: 350,
+          imageUrls: ['https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=800'],
+          description: 'Great with kids and loves to play!',
+          location: 'Seattle, WA',
+          createdAt: DateTime.now(),
+          likedBy: [],
+          passedBy: [],
+        ),
+        Pet(
+          id: '5',
+          sellerId: 'mock_seller_5',
+          name: 'Daisy',
+          breed: 'Pomeranian',
+          age: 2,
+          size: 'small',
+          energyLevel: 'medium',
+          price: 600,
+          imageUrls: ['https://images.unsplash.com/photo-1546527868-ccb7ee7dfa6a?w=800'],
+          description: 'Adorable fluffy companion with a sweet personality.',
+          location: 'Portland, OR',
+          createdAt: DateTime.now(),
+          likedBy: [],
+          passedBy: [],
+        ),
+        Pet(
+          id: '6',
+          sellerId: 'mock_seller_6',
+          name: 'Rocky',
+          breed: 'German Shepherd',
+          age: 3,
+          size: 'large',
+          energyLevel: 'high',
+          price: 700,
+          imageUrls: ['https://images.unsplash.com/photo-1568572933382-74d440642117?w=800'],
+          description: 'Loyal and protective, needs experienced owner.',
+          location: 'Denver, CO',
+          createdAt: DateTime.now(),
+          likedBy: [],
+          passedBy: [],
+        ),
+        Pet(
+          id: '7',
+          sellerId: 'mock_seller_7',
+          name: 'Milo',
+          breed: 'Corgi',
+          age: 2,
+          size: 'medium',
+          energyLevel: 'medium',
+          price: 900,
+          imageUrls: ['https://images.unsplash.com/photo-1612536459960-c5f5c3c09214?w=800'],
+          description: 'Smart and friendly, loves everyone!',
+          location: 'Boston, MA',
+          createdAt: DateTime.now(),
+          likedBy: [],
+          passedBy: [],
+        ),
+        Pet(
+          id: '8',
+          sellerId: 'mock_seller_8',
+          name: 'Sophie',
+          breed: 'Poodle',
+          age: 5,
+          size: 'medium',
+          energyLevel: 'low',
+          price: 550,
+          imageUrls: ['https://images.unsplash.com/photo-1616496387351-c0e1e5b63b69?w=800'],
+          description: 'Elegant and calm, perfect for seniors.',
+          location: 'Miami, FL',
+          createdAt: DateTime.now(),
+          likedBy: [],
+          passedBy: [],
+        ),
+      ];
+      _isLoading = false;
+    });
+
+    _loadUserProfile();
+  }
+
+  Future<void> _loadUserProfile() async {
     final uid = _authService.currentUser!.uid;
     _userProfile = await _authService.getUserProfile(uid);
     
-    _firestoreService.getAvailablePets(uid).listen((pets) {
-      if (!mounted) return;
+    // Initialize recommendation service with user profile
+    if (_userProfile != null) {
+      _recommendationService = RecommendationService(_userProfile!);
       
+      // Rank pets based on initial compatibility
       setState(() {
-        _pets = pets;
-        _isLoading = false;
+        _pets = _recommendationService!.rankPets(_pets, _userProfile!);
       });
-    });
+    }
+    
+    if (mounted) setState(() {});
   }
 
   Future<void> _handleLike() async {
     if (_currentIndex >= _pets.length) return;
     
     final pet = _pets[_currentIndex];
-    final uid = _authService.currentUser!.uid;
+    
+    // Record swipe for learning
+    _recommendationService?.recordSwipe(pet, true);
     
     setState(() {
       _likesCount++;
       _currentIndex++;
     });
     
+    // Uncomment when using real Firebase:
+    /*
+    final uid = _authService.currentUser!.uid;
     await _firestoreService.likePet(pet.id, uid);
-    
-    // Create match
     final matchId = await _firestoreService.createMatch(uid, pet.sellerId, pet.id);
+    */
     
     if (!mounted) return;
-    _showMatchDialog(pet, matchId);
+    _showMatchDialog(pet, 'mock_match_id');
   }
 
   Future<void> _handlePass() async {
     if (_currentIndex >= _pets.length) return;
     
     final pet = _pets[_currentIndex];
-    final uid = _authService.currentUser!.uid;
+    
+    // Record swipe for learning
+    _recommendationService?.recordSwipe(pet, false);
     
     setState(() {
       _passesCount++;
       _currentIndex++;
     });
     
+    // Uncomment when using real Firebase:
+    /*
+    final uid = _authService.currentUser!.uid;
     await _firestoreService.passPet(pet.id, uid);
+    */
   }
 
   void _showMatchDialog(Pet pet, String matchId) {
@@ -90,12 +243,12 @@ class _SwipeScreenState extends State<SwipeScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               const Text(
-                'yippeee',
+                '🎉',
                 style: TextStyle(fontSize: 64),
               ),
               const SizedBox(height: 16),
               const Text(
-                'It\'s a Match!!!!',
+                'It\'s a Match!',
                 style: TextStyle(
                   fontSize: 28,
                   fontWeight: FontWeight.bold,
@@ -103,7 +256,7 @@ class _SwipeScreenState extends State<SwipeScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'You liked ${pet.name}!!!!!',
+                'You liked ${pet.name}!',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],
@@ -170,53 +323,11 @@ class _SwipeScreenState extends State<SwipeScreen> {
   }
 
   int _calculateCompatibility(Pet pet) {
-    if (_userProfile == null) return 75;
+    if (_userProfile == null || _recommendationService == null) return 75;
     
-    int score = 0;
-    int factors = 0;
-
-    // Budget match (30 points)
-    if (_userProfile!.budget != null) {
-      factors++;
-      final budgetDiff = (_userProfile!.budget! - pet.price).abs();
-      if (budgetDiff <= 100) {
-        score += 30;
-      } else if (budgetDiff <= 300) {
-        score += 20;
-      } else if (budgetDiff <= 500) {
-        score += 10;
-      }
-    }
-
-    if (_userProfile!.preferredSizes != null && 
-        _userProfile!.preferredSizes!.contains(pet.size)) {
-      score += 25;
-      factors++;
-    }
-
-    if (_userProfile!.homeSize != null) {
-      factors++;
-      final Map<String, List<String>> compatibleSizes = {
-        'small': ['small'],
-        'medium': ['small', 'medium'],
-        'large': ['small', 'medium', 'large'],
-      };
-      if (compatibleSizes[_userProfile!.homeSize]!.contains(pet.size)) {
-        score += 20;
-      }
-    }
-
-    if (_userProfile!.activityLevel != null) {
-      factors++;
-      if (_userProfile!.activityLevel == pet.energyLevel) {
-        score += 25;
-      } else if ((_userProfile!.activityLevel == 'medium' && pet.energyLevel != 'medium') ||
-                 (pet.energyLevel == 'medium' && _userProfile!.activityLevel != 'medium')) {
-        score += 15;
-      }
-    }
-
-    return factors > 0 ? score : 75;
+    // Use recommendation service score (0.0-1.0) and convert to percentage
+    final score = _recommendationService!.scoreFor(pet, _userProfile!);
+    return (score * 100).round();
   }
 
   @override
@@ -270,12 +381,12 @@ class _SwipeScreenState extends State<SwipeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'doggiee',
+                '🐕',
                 style: TextStyle(fontSize: 80),
               ),
               const SizedBox(height: 24),
               const Text(
-                'PLACEHOLDER FOR NO MORE PETS NEAR YOU',
+                'No more pets nearby!',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -283,7 +394,7 @@ class _SwipeScreenState extends State<SwipeScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'PLACEHOLDER BUT CHECK BACK LATER',
+                'Check back later for more matches',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.grey[600],
@@ -313,6 +424,23 @@ class _SwipeScreenState extends State<SwipeScreen> {
         ),
         centerTitle: true,
         actions: [
+          // Debug button (remove for production)
+          IconButton(
+            icon: const Icon(Icons.science, color: Colors.black),
+            onPressed: () {
+              if (_recommendationService != null) {
+                final state = _recommendationService!.getPreferenceState();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '🧠 Swipes: ${state['swipeCount']}, Liked: ${state['likedCount']}, Updates: ${state['updateCount']}',
+                    ),
+                    duration: const Duration(seconds: 3),
+                  ),
+                );
+              }
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.chat, color: Colors.black),
             onPressed: () {
@@ -334,6 +462,7 @@ class _SwipeScreenState extends State<SwipeScreen> {
       ),
       body: Column(
         children: [
+          // Stats Bar
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             color: Colors.white,
@@ -349,6 +478,7 @@ class _SwipeScreenState extends State<SwipeScreen> {
           
           const SizedBox(height: 16),
           
+          // Pet Card with Swipe Gestures
           Expanded(
             child: GestureDetector(
               onHorizontalDragEnd: (details) {
@@ -364,6 +494,7 @@ class _SwipeScreenState extends State<SwipeScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Stack(
                   children: [
+                    // Show next card behind for depth effect
                     if (_currentIndex + 1 < _pets.length)
                       Positioned(
                         top: 10,

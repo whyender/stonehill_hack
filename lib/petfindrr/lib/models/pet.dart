@@ -6,8 +6,8 @@ class Pet {
   final String name;
   final String breed;
   final int age;
-  final String size; // small, medium, large to see if owner had enough sapce
-  final String energyLevel; // low, medium, high to see how man ywalks they need
+  final String size; // small, medium, large
+  final String energyLevel; // low, medium, high
   final double price;
   final List<String> imageUrls;
   final String description;
@@ -34,6 +34,42 @@ class Pet {
     this.likedBy = const [],
     this.passedBy = const [],
   });
+
+  
+  int get sizeScore {
+    switch (size.toLowerCase()) {
+      case 'small': return 1;
+      case 'medium': return 2;
+      case 'large': return 3;
+      default: return 2;
+    }
+  }
+
+  int get energyScore {
+    switch (energyLevel.toLowerCase()) {
+      case 'low': return 1;
+      case 'medium': return 2;
+      case 'high': return 3;
+      default: return 2;
+    }
+  }
+
+  double get priceScore {
+    return (price / 2000.0).clamp(0.0, 1.0);
+  }
+
+  int get ageScore {
+    if (age <= 2) return 1;
+    if (age <= 7) return 2;
+    return 3;
+  }
+
+  List<double> get featureVector => [
+        sizeScore.toDouble(),
+        energyScore.toDouble(),
+        priceScore,
+        ageScore.toDouble(),
+      ];
 
   factory Pet.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;

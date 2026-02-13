@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'screens/splash_screen.dart';
+
+// Comment out Firebase for now
+// import 'package:firebase_core/firebase_core.dart';
+import 'screens/role_selection_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  
+  // Comment out Firebase initialization
+  // await Firebase.initializeApp();
+  
   runApp(const PetMatchApp());
 }
 
@@ -22,7 +27,7 @@ class PetMatchApp extends StatelessWidget {
         useMaterial3: true,
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const SplashScreen(),
+      home: const RoleSelectionScreen(), // Start here instead of SplashScreen
     );
   }
 }
